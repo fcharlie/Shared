@@ -52,17 +52,17 @@ namespace Shared
             }
 
             //app.UseHttpsRedirection();
-            app.UseStaticFiles(new StaticFileOptions()
+            app.UseStaticFiles();
+
+            var dl = Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot", "dl");
+            if (!System.IO.Directory.Exists(dl))
             {
-                FileProvider = new PhysicalFileProvider(
-                    Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot", "dl")),
-                RequestPath = new PathString("/dl")
-            });
+                System.IO.Directory.CreateDirectory(dl);
+            }
 
             app.UseDirectoryBrowser(new DirectoryBrowserOptions()
             {
-                FileProvider = new PhysicalFileProvider(
-                    Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot", "dl")),
+                FileProvider = new PhysicalFileProvider(dl),
                 RequestPath = new PathString("/dl")
             });
 
