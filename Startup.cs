@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
@@ -60,11 +61,30 @@ namespace Shared
                 System.IO.Directory.CreateDirectory(dl);
             }
 
+            var provider = new FileExtensionContentTypeProvider();
+            // Add new mappings
+            //provider.Mappings[".exe"] = "application/x-msdownload";
+            provider.Mappings[".ps1"] = "application/x-msdownload"; // To support download ps1 files
+            provider.Mappings[".msi"] = "application/x-msdownload";
+            provider.Mappings[".htm3"] = "text/html";
+            provider.Mappings[".image"] = "image/png";
+            // Replace an existing mapping
+            provider.Mappings[".rtf"] = "application/x-msdownload";
+
+            app.UseStaticFiles(new StaticFileOptions()
+            {
+                FileProvider = new PhysicalFileProvider(dl),
+                RequestPath = new PathString("/dl"),
+                ContentTypeProvider = provider
+            });
+
             app.UseDirectoryBrowser(new DirectoryBrowserOptions()
             {
                 FileProvider = new PhysicalFileProvider(dl),
                 RequestPath = new PathString("/dl")
             });
+
+            //app.UseFileServer();
 
             app.UseCookiePolicy();
 
